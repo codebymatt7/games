@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravity Swap Game</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #121212;
+        }
+        h1, p {
+            color: #ffffff;
+            margin: 0;
+        }
+        #info {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        canvas {
+            border: 2px solid #ffffff;
+            background: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h1>Gravity Swap</h1>
+        <p id="levelInfo">Level: 1 | Score: 0</p>
+        <p id="highScore">High Score: 0</p>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gravity = { x: 0, y: 1 };
+        let player = { x: 50, y: 50, width: 20, height: 20, speed: 3 };
+        let goal = { x: 750, y: 550, width: 20, height: 20 };
+        let obstacles = [];
+        let isGameOver = false;
+        let currentLevel = 1;
+        let startTime = Date.now();
+        let totalScore = 0;
+        let gravitySwaps = 0;
+
+        // High score from local storage
+        let highScore = localStorage.getItem('gravitySwapHighScore') || 0;
+        document.getElementById('highScore').innerText = `High Score: ${highScore}`;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw player
+            ctx.fillStyle = '#ff6347';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Draw goal
+            ctx.fillStyle = '#32cd32';
+            ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+
+            // Draw obstacles
+            ctx.fillStyle = '#ff0000';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            });
+        }
+
+        function updatePlayer() {
+            player.x += gravity.x * player.speed;
+            player.y += gravity.y * player.speed;
+
+            if (player.x < 0) player.x = 0;
+            if (player.y < 0) player.y = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+            if (player.y > canvas.height - player.height) player.y = canvas.height - player.height;
+
+            // Check for collision with goal
+            if (player.x < goal.x + goal.width && player.x + player.width > goal.x &&
+                player.y < goal.y + goal.height && player.y + player.height > goal.y) {
+                nextLevel();
+            }
+
+            // Check for collision with obstacles
+            obstacles.forEach(obstacle => {
+                if (player.x < obstacle.x + obstacle.width && player.x + player.width > obstacle.x &&
+                    player.y < obstacle.y + obstacle.height && player.y + player.height > obstacle.y) {
+                    gameOver();
+                }
+            });
+        }
+
+        function nextLevel() {
+            let timeTaken = Date.now() - startTime;
+            let levelScore = Math.max(10000 - timeTaken, 0) / (gravitySwaps || 1);
+            totalScore += Math.round(levelScore);
+            currentLevel += 1;
+
+            alert(`Level ${currentLevel - 1} complete! Moving to level ${currentLevel}.`);
+            resetGame();
+        }
+
+        function resetGame() {
+            player.x = 50;
+            player.y = 50;
+            gravity = { x: 0, y: 1 };
+            gravitySwaps = 0;
+            startTime = Date.now();
+            generateRandomLevel(currentLevel);
+        }
+
+        function generateRandomLevel(level) {
+            goal = {
+                x: Math.floor(Math.random() * (canvas.width - 50)) + 50,
+                y: Math.floor(Math.random() * (canvas.height - 50)) + 50,
+                width: 20,
+                height: 20
+            };
+
+            let numberOfObstacles = Math.min(level + 3, 25); // Increase obstacle count each level
+            obstacles = [];
+
+            // Define safe zone around starting position
+            const safeZone = {
+                x: player.x - 50,
+                y: player.y,
+                width: 100,
+                height: 150 // Safe area extended downward
+            };
+
+            for (let i = 0; i < numberOfObstacles; i++) {
+                let obstacle = {
+                    x: Math.floor(Math.random() * (canvas.width - 50)),
+                    y: Math.floor(Math.random() * (canvas.height - 50)),
+                    width: Math.floor(Math.random() * 50) + 20,
+                    height: Math.floor(Math.random() * 50) + 20
+                };
+
+                // Ensure obstacle doesn't overlap with safe zone or goal
+                if (overlaps(obstacle, safeZone) || overlaps(obstacle, goal)) {
+                    i--;  // Retry generating this obstacle
+                } else {
+                    obstacles.push(obstacle);
+                }
+            }
+
+            document.getElementById("levelInfo").innerText = `Level: ${level} | Score: ${totalScore}`;
+        }
+
+        function overlaps(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            alert(`Game Over! Final Score: ${totalScore}`);
+
+            // Check for high score
+            if (totalScore > highScore) {
+                highScore = totalScore;
+                localStorage.setItem('gravitySwapHighScore', highScore);
+                document.getElementById('highScore').innerText = `High Score: ${highScore}`;
+                alert(`New High Score: ${highScore}!`);
+            }
+        }
+
+        function changeGravity(event) {
+            if (event.code === 'Space') {
+                gravitySwaps++;
+                if (gravity.x === 0 && gravity.y === 1) { gravity.x = 1; gravity.y = 0; }
+                else if (gravity.x === 1 && gravity.y === 0) { gravity.x = 0; gravity.y = -1; }
+                else if (gravity.x === 0 && gravity.y === -1) { gravity.x = -1; gravity.y = 0; }
+                else if (gravity.x === -1 && gravity.y === 0) { gravity.x = 0; gravity.y = 1; }
+            }
+        }
+
+        function gameLoop() {
+            if (!isGameOver) {
+                updatePlayer();
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        window.addEventListener('keydown', changeGravity);
+        generateRandomLevel(currentLevel);
+        gameLoop();
+    </script>
+</body>
+</html>
