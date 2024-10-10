@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub - Select a Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 50px;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .game-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .game-item {
+            background: #1e1e1e;
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            width: 250px;
+            margin: 10px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        .game-item:hover {
+            transform: scale(1.05);
+            border-color: #61dafb;
+        }
+        .game-item h2 {
+            margin-top: 0;
+        }
+        .play-button {
+            background-color: #61dafb;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .play-button:hover {
+            background-color: #21a1f1;
+        }
+        footer {
+            margin-top: 40px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Game Hub</h1>
+    <p>Select a game below to start playing!</p>
+    <div class="game-container">
+        <!-- Gravity Swap -->
+        <div class="game-item">
+            <h2>Gravity Swap</h2>
+            <p>A unique puzzle platformer where you manipulate gravity to reach your goal.</p>
+            <a class="play-button" href="(BEST)GravitySwapindex.html">Play Gravity Swap</a>
+        </div>
+        
+        <!-- Tetris -->
+        <div class="game-item">
+            <h2>Tetris</h2>
+            <p>The classic Tetris game. Align the falling blocks and clear rows for points.</p>
+            <a class="play-button" href="(best)tetris4.html">Play Tetris</a>
+        </div>
+
+        <!-- Astro Blaster -->
+        <div class="game-item">
+            <h2>Astro Blaster</h2>
+            <p>Shoot down asteroids and power up your spaceship. How long can you survive?</p>
+            <a class="play-button" href="bestasteroidblasterindex.html">Play Astro Blaster</a>
+        </div>
+
+        <!-- Wordle -->
+        <div class="game-item">
+            <h2>Wordle</h2>
+            <p>Guess the 5-letter word in as few attempts as possible. Can you solve it?</p>
+            <a class="play-button" href="wordle.html">Play Wordle</a>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 My Game Hub | Created by [Your Name]
+    </footer>
+</body>
+</html>
